@@ -36,3 +36,33 @@ pub fn execute_command(command: String) -> Result<String, String> {
         }
     }
 }
+
+#[command]
+pub fn get_completion_suggestions(partial_command: String) -> Result<Vec<String>, String> {
+    // Get user's home directory
+    let home_dir = env::var("HOME").unwrap_or_else(|_| String::from("/"));
+
+    // Use bash's built-in completion
+    let completion_cmd = format!("compgen -c {} | sort | uniq", partial_command);
+
+    let output = StdCommand::new("bash")
+        .arg("-c")
+        .arg(&completion_cmd)
+        .current_dir(home_dir)
+        .output()
+        .map_err(|e| e.to_string())?;
+
+    if !output.status.success() {
+        return Err(String::from_utf8_lossy(&output.stderr).to_string());
+    }
+
+    // Parse suggestions
+    let stdout = String::from_utf8_lossy(&output.stdout).to_string();
+    let suggestions: Vec<String> = stdout
+        .lines()
+        .filter(|line| !line.is_empty())
+        .map(|line| line.to_string())
+        .collect();
+
+    Ok(suggestions)
+}

@@ -65,6 +65,50 @@ export function Terminal() {
       }
     };
 
+    const getTabCompletion = async () => {
+      try {
+        // Get current command
+        const cmd = commandRef.current.trim();
+        if (!cmd) return;
+
+        // Get the word being completed
+        const words = cmd.split(' ');
+        const currentWord = words[words.length - 1];
+
+        // Get suggestions from backend
+        const suggestions = await invoke<string[]>('get_completion_suggestions', {
+          partialCommand: currentWord
+        });
+
+        if (suggestions.length === 0) return;
+
+        if (suggestions.length === 1) {
+          // If there's only one suggestion, use it
+          const completion = suggestions[0].slice(currentWord.length);
+          xterm.write(completion);
+          commandRef.current += completion;
+        } else {
+          // Show all suggestions
+          xterm.writeln('');
+
+          // Display suggestions in columns
+          const maxLength = Math.max(...suggestions.map(s => s.length)) + 2;
+          const termWidth = Math.floor(xterm.cols / maxLength);
+
+          for (let i = 0; i < suggestions.length; i += termWidth) {
+            const row = suggestions.slice(i, i + termWidth);
+            const line = row.map(s => s.padEnd(maxLength)).join('');
+            xterm.writeln(line);
+          }
+
+          // Redisplay prompt and current command
+          xterm.write('$ ' + commandRef.current);
+        }
+      } catch (error) {
+        console.error('Tab completion error:', error);
+      }
+    };
+
     // Handle input
     xterm.onData((data) => {
       switch (data) {
@@ -77,6 +121,9 @@ export function Terminal() {
           } else {
             xterm.write('\r\n$ ');
           }
+          break;
+        case '\t': // Tab
+          getTabCompletion();
           break;
         case '\u0003': // Ctrl+C
           xterm.write('^C\r\n$ ');
