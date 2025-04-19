@@ -1,13 +1,18 @@
 use std::process::Command as StdCommand;
+use std::env;
 use tauri::command;
 
 #[command]
 pub fn execute_command(command: String) -> Result<String, String> {
     println!("Executing command: {}", command);
 
+    // Get user's home directory
+    let home_dir = env::var("HOME").unwrap_or_else(|_| String::from("/"));
+
     let output = StdCommand::new("sh")
         .arg("-c")
         .arg(&command)
+        .current_dir(home_dir)
         .output()
         .map_err(|e| {
             println!("Command error: {}", e);
