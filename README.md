@@ -1,58 +1,67 @@
-# Taurminal: A Terminal Emulator Built with Tauri, React, and TypeScript
 
-Taurminal is a desktop application designed to function as a terminal emulator. It leverages the power of **Tauri** for lightweight and secure desktop app development, **React** for building dynamic user interfaces, and **TypeScript** for type-safe and maintainable code. The project is built using **Vite** for fast development and optimized builds.
+# Taurminal: Terminal Emulator Built with Tauri, React, and TypeScript
 
-## Features
+![License](https://img.shields.io/badge/license-MIT-blue.svg)
+![Platform](https://img.shields.io/badge/platform-macOS%20%7C%20Windows%20%7C%20Linux-lightgrey)
+![Built with Tauri](https://img.shields.io/badge/built%20with-tauri-blueviolet)
+![Made with React](https://img.shields.io/badge/made%20with-react-61DAFB?logo=react)
+![TypeScript](https://img.shields.io/badge/code-typescript-3178C6?logo=typescript)
 
-- **Terminal Emulator**: Provides a customizable and efficient terminal experience.
-- **Tauri Integration**: Ensures a lightweight and secure desktop application.
-- **React + TypeScript**: Enables a modern, scalable, and maintainable front-end architecture.
-- **Cross-Platform**: Runs seamlessly on macOS, Windows, and Linux.
+**Taurminal** is a modern desktop terminal emulator built using **Tauri** for lightweight and secure app delivery, **React** for a responsive UI, and **TypeScript** for type safety and scalability. Powered by **Vite**, the development experience is lightning-fast with optimized builds out of the box.
 
-## Getting Started
+## ✨ Features
 
-1. Clone the repository:
+- **Terminal Emulator** – Sleek and customizable interface for terminal interaction.
+- **Tauri Backend** – Secure, lightweight, and performant native integration via Rust.
+- **Modern Frontend Stack** – Built with React + TypeScript for maintainability.
+- **Cross-Platform Support** – Works seamlessly on macOS, Windows, and Linux.
+
+## 🚀 Getting Started
+
+1. **Clone the repository**
    ```bash
    git clone <repository-url>
    cd taurminal
    ```
 
-2. Install dependencies:
+2. **Install dependencies**
    ```bash
    npm install
    ```
 
-3. Start the development server:
+3. **Start the development server**
    ```bash
    npm run dev
    ```
 
-4. Build the Tauri application:
+4. **Build the Tauri desktop app**
    ```bash
    npm run tauri build
    ```
 
-## Recommended IDE Setup
+## 🛠️ Recommended IDE Setup
 
-For the best development experience, use the following tools:
+To get the most out of development, we recommend:
 
 - [Visual Studio Code](https://code.visualstudio.com/)
-  - [Tauri Extension](https://marketplace.visualstudio.com/items?itemName=tauri-apps.tauri-vscode)
+  - [Tauri VS Code Extension](https://marketplace.visualstudio.com/items?itemName=tauri-apps.tauri-vscode)
   - [Rust Analyzer](https://marketplace.visualstudio.com/items?itemName=rust-lang.rust-analyzer)
 
-## Project Structure
+## 📁 Project Structure
 
-- **`src/`**: Contains the React application code, including the terminal emulator's UI and logic.
-- **`src-tauri/`**: Contains the Tauri backend code written in Rust, handling system-level interactions.
-- **`public/`**: Static assets for the application.
+- `src/` – React frontend, including the terminal UI and logic
+- `src-tauri/` – Tauri backend (Rust), handling native system-level functions
+- `public/` – Static files served with the application
 
-## Contributing
+## 🤝 Contributing
 
-Contributions are welcome! Feel free to open issues or submit pull requests to improve the project.
+Contributions are very welcome! If you have ideas or find bugs, feel free to open issues or submit a pull request.
 
-## License
+## 📄 License
 
 This project is licensed under the [MIT License](LICENSE).
 
 ---
-Happy coding!
+
+Crafted with 💻 by **Hendro Wibowo**
+📧 [hendro.wibowo@wearesocial.net](mailto:hendrothemail@gmail.com)
