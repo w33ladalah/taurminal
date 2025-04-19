@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Terminal as XTerm } from '@xterm/xterm';
 import { FitAddon } from '@xterm/addon-fit';
 import { WebLinksAddon } from '@xterm/addon-web-links';
@@ -10,6 +10,7 @@ export function Terminal() {
   const xtermRef = useRef<XTerm | null>(null);
   const fitAddonRef = useRef<FitAddon | null>(null);
   const commandRef = useRef<string>('');
+  const currentDirRef = useRef<string>('');
 
   useEffect(() => {
     if (!terminalRef.current) return;
@@ -40,9 +41,33 @@ export function Terminal() {
     xtermRef.current = xterm;
     fitAddonRef.current = fitAddon;
 
+    // Helper to write the prompt with current directory
+    const writePrompt = async () => {
+      try {
+        currentDirRef.current = await invoke<string>('get_current_directory');
+
+        // Format the directory path for display
+        let displayPath = currentDirRef.current;
+        const homePath = /^\/Users\/[^/]+/.exec(displayPath);
+
+        if (homePath) {
+          displayPath = displayPath.replace(homePath[0], '~');
+        }
+
+        // Get base name of current directory
+        const baseDir = displayPath.split('/').pop() || '';
+        const prompt = `\x1b[1;32m${baseDir}\x1b[0m $ `;
+
+        xterm.write(prompt);
+      } catch (error) {
+        xterm.write('$ ');
+      }
+    };
+
     // Write welcome message
     xterm.writeln('Welcome to Taurminal! 🚀');
-    xterm.write('$ ');
+    // Initial prompt
+    writePrompt();
 
     const executeCommand = async (cmd: string) => {
       try {
@@ -58,10 +83,10 @@ export function Terminal() {
           if (line) xterm.writeln(line);
         }
 
-        xterm.write('$ ');
+        await writePrompt();
       } catch (error) {
         xterm.writeln(`Error: ${error}`);
-        xterm.write('$ ');
+        await writePrompt();
       }
     };
 
@@ -73,20 +98,63 @@ export function Terminal() {
 
         // Get the word being completed
         const words = cmd.split(' ');
-        const currentWord = words[words.length - 1];
+        let currentWordIndex = words.length - 1;
+        let currentWord = words[currentWordIndex];
+
+        // If the cursor is after a space, we're starting a new word
+        if (cmd.endsWith(' ')) {
+          currentWord = '';
+          currentWordIndex += 1;
+        }
 
         // Get suggestions from backend
         const suggestions = await invoke<string[]>('get_completion_suggestions', {
-          partialCommand: currentWord
+          partialCommand: currentWord,
+          fullCommand: cmd
         });
 
         if (suggestions.length === 0) return;
 
         if (suggestions.length === 1) {
           // If there's only one suggestion, use it
-          const completion = suggestions[0].slice(currentWord.length);
-          xterm.write(completion);
-          commandRef.current += completion;
+          let completion = suggestions[0];
+
+          // If this is not the first word, we need to handle relative paths
+          if (currentWordIndex > 0) {
+            // If the suggestion is already a full path, use it entirely
+            if (completion.startsWith('/') || completion.startsWith('~')) {
+              // Replace the current word entirely
+              words[currentWordIndex] = completion;
+              commandRef.current = words.join(' ');
+
+              // Clear the current word on screen
+              for (let i = 0; i < currentWord.length; i++) {
+                xterm.write('\b \b');
+              }
+
+              // Write the new word
+              xterm.write(completion);
+            } else {
+              // Just append the remaining part
+              const suffix = completion.slice(currentWord.length);
+              xterm.write(suffix);
+
+              // If it's a directory, add a space
+              if (completion.endsWith('/')) {
+                words[currentWordIndex] = completion;
+              } else {
+                words[currentWordIndex] = completion + ' ';
+                xterm.write(' ');
+              }
+
+              commandRef.current = words.join(' ');
+            }
+          } else {
+            // For the first word (command), just complete it
+            const suffix = completion.slice(currentWord.length);
+            xterm.write(suffix + ' ');
+            commandRef.current = completion + ' ';
+          }
         } else {
           // Show all suggestions
           xterm.writeln('');
@@ -102,7 +170,8 @@ export function Terminal() {
           }
 
           // Redisplay prompt and current command
-          xterm.write('$ ' + commandRef.current);
+          await writePrompt();
+          xterm.write(commandRef.current);
         }
       } catch (error) {
         console.error('Tab completion error:', error);
@@ -119,15 +188,17 @@ export function Terminal() {
             commandRef.current = '';
             executeCommand(command);
           } else {
-            xterm.write('\r\n$ ');
+            xterm.write('\r\n');
+            writePrompt();
           }
           break;
         case '\t': // Tab
           getTabCompletion();
           break;
         case '\u0003': // Ctrl+C
-          xterm.write('^C\r\n$ ');
+          xterm.write('^C\r\n');
           commandRef.current = '';
+          writePrompt();
           break;
         case '\u007F': // Backspace (DEL)
         case '\b': // Backspace (BS)

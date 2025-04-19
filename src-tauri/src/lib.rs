@@ -9,7 +9,8 @@ pub fn run() {
         .plugin(tauri_plugin_shell::init())
         .invoke_handler(tauri::generate_handler![
             commands::execute_command,
-            commands::get_completion_suggestions
+            commands::get_completion_suggestions,
+            commands::get_current_directory
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
