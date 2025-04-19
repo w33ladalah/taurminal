@@ -47,8 +47,18 @@ export function Terminal() {
     const executeCommand = async (cmd: string) => {
       try {
         const result = await invoke<string>('execute_command', { command: cmd });
-        xterm.write(result);
-        xterm.write('\r\n$ ');
+
+        // Normalize line endings and write each line properly
+        const lines = result
+          .replace(/\r\n/g, '\n')
+          .replace(/\r/g, '\n')
+          .split('\n');
+
+        for (const line of lines) {
+          if (line) xterm.writeln(line);
+        }
+
+        xterm.write('$ ');
       } catch (error) {
         xterm.writeln(`Error: ${error}`);
         xterm.write('$ ');
