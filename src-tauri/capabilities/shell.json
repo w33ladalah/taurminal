@@ -1,0 +1,14 @@
+{
+  "permissions": [
+    {
+      "identifier": "shell-execute-sh",
+      "allow": [
+        {
+          "name": "sh",
+          "cmd": "sh",
+          "args": ["-c", { "validator": "\\S+" }]
+        }
+      ]
+    }
+  ]
+}
