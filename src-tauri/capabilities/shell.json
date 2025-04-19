@@ -1,14 +1,14 @@
 {
+  "identifier": "shell",
+  "description": "Allows executing shell commands",
   "permissions": [
     {
-      "identifier": "shell-execute-sh",
-      "allow": [
-        {
-          "name": "sh",
-          "cmd": "sh",
-          "args": ["-c", { "validator": "\\S+" }]
-        }
-      ]
+      "identifier": "shell:allow-execute",
+      "description": "Allows executing shell commands"
+    },
+    {
+      "identifier": "shell:allow-spawn",
+      "description": "Allows spawning shell processes"
     }
   ]
 }
