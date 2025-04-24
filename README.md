@@ -64,4 +64,4 @@ This project is licensed under the [MIT License](LICENSE).
 ---
 
 Crafted with 💻 by **Hendro Wibowo**
-📧 [hendro.wibowo@wearesocial.net](mailto:hendrothemail@gmail.com)
+📧 [hendrothemail@gmail.com](mailto:hendrothemail@gmail.com)
